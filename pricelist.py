@@ -13,7 +13,7 @@ class PriceList:
 		'Short Description': ['Description'],
 		'URL': ['URL'],
 		# RRP and Cost are determined by highest and lowest dollar values in sheet
-		'RRP':['RRP', 'MSRP'],
+		'MSRP':['RRP', 'MSRP'],
 		'Unit Cost':['Unit Cost','Trade','Buy','W/Sale']
 	}
 
@@ -25,14 +25,14 @@ class PriceList:
 
 
 
-	def __init__(self, man, file):
+	def __init__(self, ven, file):
 
-		# Manufacturer passed by method caller
-		self.manufacturer = man
+		# Vendor passed by method caller
+		self.vendor = ven
 
-		# Vendor scraped from file name
+		# Manufacturer scraped from file name
 		m = re.search("((?:[A-Za-z][A-Za-z]+))", file)
-		self.vendor = m.group(0)
+		self.manufacturer = m.group(0)
 
 		# Input file path
 		self.csv_path = file
