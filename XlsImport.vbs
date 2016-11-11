@@ -1,4 +1,5 @@
-if WScript.Arguments.Count < 1 Then
+'Accepts an xls/x file as input and creates .csv files for each sheet in the same directory'
+If WScript.Arguments.Count < 1 Then
     WScript.Echo "Please provide a file"
     Wscript.Quit
 End If
@@ -7,6 +8,7 @@ Dim excel_obj
 Set excel_obj = CreateObject("Excel.Application")
 Dim workbook_obj
 Set workbook_obj = excel_obj.Workbooks.Open(Wscript.Arguments.Item(0))
+
 
 For Each sheet_obj In workbook_obj.sheets
 	sheet_obj.Copy

@@ -90,3 +90,18 @@ ENV/
 
 # project specific ignores
 *.sublime-workspace
+
+# temporary reference files
+*_old*
+
+# local test file directory
+pls/
+
+# csv files (often made during testing)
+*.csv
+
+# ravings - please ignore
+notes.txt
+
+# sandpit
+sandpit.py
