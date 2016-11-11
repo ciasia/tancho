@@ -3,8 +3,6 @@ import csv
 import re
 import os
 
-from sheetparser import sheetParser
-
 class PriceList:
 
 	# Static list of field identifiers/aliases
