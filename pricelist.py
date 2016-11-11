@@ -38,10 +38,10 @@ class PriceList:
 		self.csv_path = file
 		
 		# Excel file
-		csv_file = open(file, 'r', errors='ignore', encoding='utf-8') 
-
+		self.csv_file = open(file, 'r', errors='ignore', encoding='utf-8')
+		
 		# Reader for file
-		self.csv_reader = csv.reader(csv_file)	
+		self.csv_reader = csv.reader(self.csv_file)	
 
 		# Internal representation of data
 		self.data = []
@@ -163,5 +163,6 @@ class PriceList:
 		return self
 
 	def __exit__(self, exc_type, exc_value, traceback):
-		#os.unlink(self.csv_path)
+		self.csv_file.close()
+		os.unlink(self.csv_path)
 		pass
