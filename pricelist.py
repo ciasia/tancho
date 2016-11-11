@@ -123,15 +123,20 @@ class PriceList:
 
 				# Write to internal data
 				valid_row = True
+
 				row_data = {}
 				row_data['Manufacturer'] = self.manufacturer
 				row_data['Vendor'] = self.vendor
+
 				for field in field_cols:
 					col = field_cols[field]
+
 					# Detect bad rows
 					if row[col] == '' and not (field in PriceList.optional_fields):
 						valid_row = False
 						break
+
+					# If cell not blank, store value
 					if col > -1:
 						row_data[field] = row[col]
 					else:
@@ -144,8 +149,10 @@ class PriceList:
 			r += 1
 
 	def write(self):
+		# Generate file name based on manufacturer/vendor
 		newFile = os.getcwd() + '\\' + self.manufacturer + '-' +  self.vendor + ".csv"
-		print(newFile)
+
+		# Create new csv file
 		with open(newFile, 'w') as f:
 			field_names = ['Manufacturer', 'Vendor'] 
 			field_names.extend(PriceList.wordList.keys())
