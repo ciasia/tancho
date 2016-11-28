@@ -2,6 +2,9 @@ import xlrd
 import csv
 import re
 import os
+import sys
+
+import helpers
 
 class PriceList:
 
@@ -25,14 +28,14 @@ class PriceList:
 
 
 
-	def __init__(self, ven, file):
-
-		# Vendor passed by method caller
-		self.vendor = ven
+	def __init__(self, file, ven=None):
 
 		# Manufacturer scraped from file name
-		m = re.search("((?:[A-Za-z][A-Za-z]+))", file)
-		self.manufacturer = m.group(0)
+		self.manufacturer = helpers.FirstWordFromFilename(file)
+
+		# Vendor passed by method caller
+		print("Vendor: " + ven)
+		self.vendor = ven or self.manufacturer
 
 		# Input file path
 		self.csv_path = file
@@ -147,6 +150,13 @@ class PriceList:
 			r += 1
 
 	def write(self):
+
+		### Output directory - to be set by config file in future ###
+		if not os.path.basename(os.getcwd()) == 'out':
+			if not os.path.exists('out'):
+				os.makedirs('out')
+			os.chdir('out')
+
 		# Generate file name based on manufacturer/vendor
 		newFile = os.getcwd() + '\\' + self.manufacturer + '-' +  self.vendor + ".csv"
 
@@ -165,4 +175,3 @@ class PriceList:
 	def __exit__(self, exc_type, exc_value, traceback):
 		self.csv_file.close()
 		os.unlink(self.csv_path)
-		pass
