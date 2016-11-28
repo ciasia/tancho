@@ -1,5 +1,6 @@
 import sys
 import os
+from shutil import rmtree
 from subprocess import call
 
 import helpers
@@ -10,7 +11,10 @@ inputFileFormat = helpers.GetFileExtension(inputFile)
 
 # Set working directory to be the location of the main executable
 # (Fixes problems created by pyInstaller)
-os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
+
+mainDir = os.path.dirname(os.path.abspath(sys.argv[0])) 
+
+os.chdir(mainDir)
 
 # Single page csv (Manufacturer is the vendor)
 if (inputFileFormat == 'csv'):
@@ -41,3 +45,8 @@ elif (inputFileFormat[:3] == 'xls'):
 			with PriceList(tempDir + '\\' + file, ven = vendorName) as x:
 				x.parse()
 				x.write()
+
+	# Remove temporary files
+	os.chdir(mainDir)
+	if os.path.exists('temp'):
+		rmtree('temp')

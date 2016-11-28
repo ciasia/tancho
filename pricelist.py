@@ -10,11 +10,13 @@ class PriceList:
 
 	# Static list of field identifiers/aliases
 	wordList = {
+
 		# Can have just a model and no part #, but a part # without a model is just the model
 		'Model': ['Product ID', 'Model', 'Part Number'],
 		'Part Number': ['Part Number'],
 		'Short Description': ['Description'],
 		'URL': ['URL'],
+
 		# RRP and Cost are determined by highest and lowest dollar values in sheet
 		'MSRP':['RRP', 'MSRP'],
 		'Unit Cost':['Unit Cost','Trade','Buy','W/Sale']
@@ -158,11 +160,11 @@ class PriceList:
 			os.chdir('out')
 
 		# Generate file name based on manufacturer/vendor
-		newFile = os.getcwd() + '\\' + self.manufacturer + '-' +  self.vendor + ".csv"
+		newFile = os.getcwd() + '\\' + self.vendor + '-' +  self.manufacturer + ".csv"
 
 		# Create new csv file
 		with open(newFile, 'w') as f:
-			field_names = ['Manufacturer', 'Vendor'] 
+			field_names = ['Vendor', 'Manufacturer'] 
 			field_names.extend(PriceList.wordList.keys())
 			w = csv.DictWriter(f, fieldnames=field_names, lineterminator='\n')
 			w.writeheader()
