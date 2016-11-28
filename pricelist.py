@@ -30,6 +30,7 @@ class PriceList:
 
 	def __init__(self, file, ven=None):
 
+		
 		# Manufacturer scraped from file name
 		self.manufacturer = helpers.FirstWordFromFilename(file)
 

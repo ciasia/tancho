@@ -6,8 +6,11 @@ import helpers
 from pricelist import PriceList
 
 inputFile = sys.argv[1]
-inputFileDirectory = os.path.dirname(os.path.abspath(sys.argv[1]))
 inputFileFormat = helpers.GetFileExtension(inputFile)
+
+# Set working directory to be the location of the main executable
+# (Fixes problems created by pyInstaller)
+os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
 
 # Single page csv (Manufacturer is the vendor)
 if (inputFileFormat == 'csv'):
