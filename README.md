@@ -5,7 +5,10 @@ Its task is to take raw price-list .xls(x) files and convert them to an importab
 
 ## Usage
 
-### Parse price list into D-Tools compatible csv (depends on Python 3):
-`python main.py <.csv or .xls* file>`
+### Parse price list into D-Tools compatible csv:
+`tancho.exe <.csv or .xls* file>`
+*OR*
+
+Simply drag and drop the input csv/xls file onto tancho.exe
 
 .csv file will then appear in 'out' directory
