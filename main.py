@@ -16,6 +16,10 @@ mainDir = os.path.dirname(os.path.abspath(sys.argv[0]))
 
 os.chdir(mainDir)
 
+# In case a previous instance crashed, remove old temp files
+if os.path.exists('temp'):
+		rmtree('temp')
+
 # Single page csv (Manufacturer is the vendor)
 if (inputFileFormat == 'csv'):
 	with PriceList(inputFile) as x:
