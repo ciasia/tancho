@@ -34,14 +34,13 @@ class PriceList:
 		self.manufacturer = helpers.FirstWordFromFilename(file)
 
 		# Vendor passed by method caller
-		print("Vendor: " + ven)
 		self.vendor = ven or self.manufacturer
 
 		# Input file path
-		self.csv_path = file
+		self.csv_path = os.path.abspath(file)
 		
 		# Excel file
-		self.csv_file = open(file, 'r', errors='ignore', encoding='utf-8')
+		self.csv_file = open(self.csv_path, 'r', errors='ignore', encoding='utf-8')
 		
 		# Reader for file
 		self.csv_reader = csv.reader(self.csv_file)	
