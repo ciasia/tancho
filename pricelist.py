@@ -31,9 +31,10 @@ class PriceList:
 
 	def __init__(self, file, ven=None):
 
-		
 		# Manufacturer scraped from file name
-		self.manufacturer = helpers.FirstWordFromFilename(file)
+		splitFile = file.split('\\')
+		fileName = splitFile[len(splitFile) -1]
+		self.manufacturer = fileName.split('.')[0]
 
 		# Vendor passed by method caller
 		self.vendor = ven or self.manufacturer
@@ -58,7 +59,7 @@ class PriceList:
 		for key in PriceList.wordList:
 			field_cols[key] = -1
 
-		# Increments used for tracking cell_value position
+		# Increments used for tracking current cell position in source worksheet
 		r = 0
 		c = 0
 
@@ -101,7 +102,7 @@ class PriceList:
 				# If row contains valid data, store in self.data
 				if valid_row:
 
-					# Can have just a Model and no Part Number, but a Part Number without a model is just the model
+					# "Can have just a Model and no Part Number, but a Part Number without a model is just the model"
 					if 'Model' in row_data and 'Part Number' in row_data:
 						if not row_data['Part Number'] == '':
 
@@ -111,7 +112,7 @@ class PriceList:
 
 							elif row_data['Model'] == row_data['Part Number']:
 								row_data['Part Number'] = ''
-								
+
 					self.data.append(row_data)
 
 			# Look for columns
