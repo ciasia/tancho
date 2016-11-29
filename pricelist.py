@@ -10,16 +10,22 @@ class PriceList:
 
 	# Static list of field identifiers/aliases
 	wordList = {
-
 		'Model': ['Product ID', 'Model', 'Part Number'],
 		'Part Number': ['Part Number'],
 		'Short Description': ['Description'],
 		'URL': ['URL'],
+		'MSRP':[],
+		'Unit Cost':[]
+
+		
+	}
 
 		# RRP and Cost are determined by highest and lowest dollar values in sheet
+		# Archival values for possible future use
+		'''
 		'MSRP':['RRP', 'MSRP'],
 		'Unit Cost':['Unit Cost','Trade','Buy','W/Sale']
-	}
+		'''
 
 	optional_fields = [
 		'Part Number',
@@ -128,16 +134,18 @@ class PriceList:
 							if cell_value[0] == '$':
 								castable_cell_value = re.sub('[$,]','',cell_value)
 								money = float(castable_cell_value)
+
 								
-								if field == 'rrp':
+								if field == 'MSRP':
 									if money > highest:
 											highest = money
 											match = True
 
-								if field == 'cost':
+								if field == 'Unit Cost':
 										if money < lowest:
 											lowest = money
-											match = True	
+											match = True
+									
 
 							# Find field column by field name			
 							else:
