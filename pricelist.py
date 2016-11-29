@@ -14,8 +14,8 @@ class PriceList:
 		'Part Number': ['Part Number'],
 		'Short Description': ['Description'],
 		'URL': ['URL'],
-		'MSRP':[],
-		'Unit Cost':[]
+		'MSRP':['RRP', 'MSRP'],
+		'Unit Cost':['Unit Cost','Trade','Buy','W/Sale']
 	}
 
 	# RRP and Cost are determined by highest and lowest dollar values in sheet
@@ -34,6 +34,8 @@ class PriceList:
 
 
 	def __init__(self, file, ven=None):
+
+		print("Parsing " + file)
 
 		# Manufacturer scraped from file name
 		splitFile = file.split('\\')
@@ -78,18 +80,32 @@ class PriceList:
 			highest = -1 
 			lowest = float('inf')
 
-			
-			# Look for columns
 			if not all_fields_found:
+				# Look for desired field columns
 				for cell_value in row:
-					for field, aliases in PriceList.wordList.items():
-						
-						# Check cell values against word list
-						match = False
-						if len(cell_value) > 1: # Only check non-blank cells
+					# Only check non-blank cells
+					if len(cell_value) > 1: 
 
-							# Find field column by dollar value
-							if '$' in cell_value:
+						for field, aliases in PriceList.wordList.items():
+							
+							# Check cell values against word list
+							match = False
+							
+							currency_regex = re.compile("^\s*\$*\s*[0-9]+,*\s*[0-9]*\.+[0-9]+\s*$")
+
+							# Find field column by field name
+							if not currency_regex.match(cell_value):
+								for alias in aliases:
+									if field_cols[field] == -1:
+										reg='.*?('+alias+')'
+										m = re.search(reg, cell_value,re.IGNORECASE) #Partial string matching
+
+										if m:
+											match = True
+											header_row = r
+
+							# Find field column by dollar value		
+							else:
 								castable_cell_value = re.sub("[$,\s]",'',cell_value)
 								money = float(castable_cell_value)
 
@@ -103,28 +119,17 @@ class PriceList:
 										if money < lowest:
 											lowest = money
 											match = True
-									
 
-							# Find field column by field name			
-							else:
-								for alias in aliases:
-									reg='.*?('+alias+')'
-									m = re.search(reg, cell_value,re.IGNORECASE) #Partial string matching
+							# Update field columns
+							if match:
+									field_cols[field] = c
 
-									if m:
-										match = True
-										header_row = r
-
-						# Update field columns
-						if match:
-								field_cols[field] = c
-
-					# Check if all required columns have a match
-					if not all_fields_found:
-						all_fields_found = True
-						for x in field_cols:
-							if field_cols[x] == -1 and not (x in PriceList.optional_fields):
-								all_fields_found = False
+						# Check if all required columns have a match
+						if not all_fields_found:
+							all_fields_found = True
+							for x in field_cols:
+								if field_cols[x] == -1 and not (x in PriceList.optional_fields):
+									all_fields_found = False
 
 					# Next cell
 					c = (c+1)%len(row)
