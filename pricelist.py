@@ -89,8 +89,8 @@ class PriceList:
 						if len(cell_value) > 1: # Only check non-blank cells
 
 							# Find field column by dollar value
-							if cell_value[0] == '$':
-								castable_cell_value = re.sub('[$,]','',cell_value)
+							if '$' in cell_value:
+								castable_cell_value = re.sub("[$,\s]",'',cell_value)
 								money = float(castable_cell_value)
 
 								
