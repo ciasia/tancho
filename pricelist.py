@@ -151,6 +151,8 @@ class PriceList:
 			# Next row
 			r += 1
 
+		return ((len(self.data) > 0))
+
 	def write(self):
 
 		### Output directory - to be set by config file in future ###

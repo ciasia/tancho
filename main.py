@@ -23,8 +23,8 @@ if os.path.exists('temp'):
 # Single page csv (Manufacturer is the vendor)
 if (inputFileFormat == 'csv'):
 	with PriceList(inputFile) as x:
-		x.parse()
-		x.write()
+		if x.parse():
+			x.write()
 
 # Excel file
 elif (inputFileFormat[:3] == 'xls'):	
@@ -47,8 +47,8 @@ elif (inputFileFormat[:3] == 'xls'):
 
 		if (subFileFormat == 'csv'):
 			with PriceList(tempDir + '\\' + file, ven = vendorName) as x:
-				x.parse()
-				x.write()
+				if x.parse():
+					x.write()
 
 	# Remove temporary files
 	os.chdir(mainDir)
