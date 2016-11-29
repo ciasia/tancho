@@ -63,7 +63,7 @@ class PriceList:
 		c = 0
 
 		all_fields_found = False
-		all_money_found = False
+
 
 		header_row = 0
 
@@ -72,58 +72,8 @@ class PriceList:
 			highest = float('inf')
 			lowest = -1
 
-
-			if not all_money_found:
-				for cell_value in row:
-					for field, aliases in PriceList.wordList.items():
-						
-						# Check cell values against word list
-						match = False
-						if len(cell_value) > 1: # Only check non-blank cells
-
-							# Find field column by dollar value
-							if cell_value[0] == '$':
-								castable_cell_value = re.sub('[$,]','',cell_value)
-								money = float(castable_cell_value)
-								
-								if field == 'rrp':
-									if money > highest:
-											highest = money
-											match = True
-
-								if field == 'cost':
-										if money < lowest:
-											lowest = money
-											match = True	
-											
-							# Find field column by field name			
-							else:
-								for alias in aliases:
-									reg='.*?('+alias+')'
-									m = re.search(reg, cell_value,re.IGNORECASE) #Partial string matching
-
-									if m:
-										match = True
-										header_row = r
-
-						# Update field columns
-						if match:
-								field_cols[field] = c
-
-					# Check if all required columns have a match
-					if not all_fields_found:
-						all_fields_found = True
-						for x in field_cols:
-							if field_cols[x] == -1 and not (x in PriceList.optional_fields):
-								all_fields_found = False
-					
-					all_money_found = (highest < float('inf') and lowest > -1)
-
-					# Next cell
-					c = (c+1)%len(row)
-
+			# Check if columns containing data have already been found
 			if all_fields_found and not header_row == r: 
-
 
 				# Write to internal data
 				valid_row = True
@@ -160,6 +110,54 @@ class PriceList:
 
 					if valid_row:
 						self.data.append(row_data)
+
+			# Look for columns
+			else:
+				for cell_value in row:
+					for field, aliases in PriceList.wordList.items():
+						
+						# Check cell values against word list
+						match = False
+						if len(cell_value) > 1: # Only check non-blank cells
+
+							# Find field column by dollar value
+							if cell_value[0] == '$':
+								castable_cell_value = re.sub('[$,]','',cell_value)
+								money = float(castable_cell_value)
+								
+								if field == 'rrp':
+									if money > highest:
+											highest = money
+											match = True
+
+								if field == 'cost':
+										if money < lowest:
+											lowest = money
+											match = True	
+
+							# Find field column by field name			
+							else:
+								for alias in aliases:
+									reg='.*?('+alias+')'
+									m = re.search(reg, cell_value,re.IGNORECASE) #Partial string matching
+
+									if m:
+										match = True
+										header_row = r
+
+						# Update field columns
+						if match:
+								field_cols[field] = c
+
+					# Check if all required columns have a match
+					if not all_fields_found:
+						all_fields_found = True
+						for x in field_cols:
+							if field_cols[x] == -1 and not (x in PriceList.optional_fields):
+								all_fields_found = False
+
+					# Next cell
+					c = (c+1)%len(row)
 
 			# Next row
 			r += 1
