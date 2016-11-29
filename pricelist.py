@@ -16,16 +16,14 @@ class PriceList:
 		'URL': ['URL'],
 		'MSRP':[],
 		'Unit Cost':[]
-
-		
 	}
 
-		# RRP and Cost are determined by highest and lowest dollar values in sheet
-		# Archival values for possible future use
-		'''
-		'MSRP':['RRP', 'MSRP'],
-		'Unit Cost':['Unit Cost','Trade','Buy','W/Sale']
-		'''
+	# RRP and Cost are determined by highest and lowest dollar values in sheet
+	# Archival values for possible future use
+	'''
+	'MSRP':['RRP', 'MSRP'],
+	'Unit Cost':['Unit Cost','Trade','Buy','W/Sale']
+	'''
 
 	optional_fields = [
 		'Part Number',
@@ -80,49 +78,9 @@ class PriceList:
 			highest = -1 
 			lowest = float('inf')
 
-			# Check if columns containing data have already been found
-			if all_fields_found and not header_row == r: 
-
-				# Assume row contains desired values until proven otherwise
-				valid_row = True
-
-				# Temporary dictionary for desired values of current row
-				row_data = {}
-				row_data['Manufacturer'] = self.manufacturer
-				row_data['Vendor'] = self.vendor
-
-				for field in field_cols:
-					field_col = field_cols[field]
-
-					# Detect bad rows
-					if row[field_col] == '' and not (field in PriceList.optional_fields):
-						valid_row = False
-						break
-
-					# If cell not blank, grab value
-					if field_col > -1:
-						row_data[field] = row[field_col]
-					else:
-						row_data[field] = ''
-
-				# If row contains valid data, store in self.data
-				if valid_row:
-
-					# "Can have just a Model and no Part Number, but a Part Number without a model is just the model"
-					if 'Model' in row_data and 'Part Number' in row_data:
-						if not row_data['Part Number'] == '':
-
-							if row_data['Model'] == '':
-								row_data['Model'] = row_data['Part Number']
-								row_data['Part Number'] = ''
-
-							elif row_data['Model'] == row_data['Part Number']:
-								row_data['Part Number'] = ''
-
-					self.data.append(row_data)
-
+			
 			# Look for columns
-			else:
+			if not all_fields_found:
 				for cell_value in row:
 					for field, aliases in PriceList.wordList.items():
 						
@@ -170,6 +128,49 @@ class PriceList:
 
 					# Next cell
 					c = (c+1)%len(row)
+
+
+			# Check if columns containing data have already been found
+			if all_fields_found and not header_row == r: 
+
+				# Assume row contains desired values until proven otherwise
+				valid_row = True
+
+				# Temporary dictionary for desired values of current row
+				row_data = {}
+				row_data['Manufacturer'] = self.manufacturer
+				row_data['Vendor'] = self.vendor
+
+				for field in field_cols:
+					field_col = field_cols[field]
+
+					# Detect bad rows
+					if row[field_col] == '' and not (field in PriceList.optional_fields):
+						valid_row = False
+						break
+
+					# If cell not blank, grab value
+					if field_col > -1:
+						row_data[field] = row[field_col]
+					else:
+						row_data[field] = ''
+
+				# If row contains valid data, store in self.data
+				if valid_row:
+
+					# "Can have just a Model and no Part Number, but a Part Number without a model is just the model"
+					if 'Model' in row_data and 'Part Number' in row_data:
+						if not row_data['Part Number'] == '':
+
+							if row_data['Model'] == '':
+								row_data['Model'] = row_data['Part Number']
+								row_data['Part Number'] = ''
+
+							elif row_data['Model'] == row_data['Part Number']:
+								row_data['Part Number'] = ''
+
+					self.data.append(row_data)
+
 
 			# Next row
 			r += 1
