@@ -62,22 +62,24 @@ class PriceList:
 		r = 0
 		c = 0
 
+		# Whether the columns associated to all desired data fields have been identified
 		all_fields_found = False
 
-
+		# Row containing column names (assumed to be zero until proven otherwise)
 		header_row = 0
 
 		for row in self.csv_reader:
 
-			highest = float('inf')
-			lowest = -1
+			highest = -1 
+			lowest = float('inf')
 
 			# Check if columns containing data have already been found
 			if all_fields_found and not header_row == r: 
 
-				# Write to internal data
+				# Assume row contains desired values until proven otherwise
 				valid_row = True
 
+				# Temporary dictionary for desired values of current row
 				row_data = {}
 				row_data['Manufacturer'] = self.manufacturer
 				row_data['Vendor'] = self.vendor
@@ -90,26 +92,27 @@ class PriceList:
 						valid_row = False
 						break
 
-					# If cell not blank, store value
+					# If cell not blank, grab value
 					if field_col > -1:
 						row_data[field] = row[field_col]
 					else:
 						row_data[field] = ''
 
+				# If row contains valid data, store in self.data
+				if valid_row:
 
-				# Can have just a Model and no Part Number, but a Part Number without a model is just the model
-				if 'Model' in row_data and 'Part Number' in row_data:
-					if not row_data['Part Number'] == '':
+					# Can have just a Model and no Part Number, but a Part Number without a model is just the model
+					if 'Model' in row_data and 'Part Number' in row_data:
+						if not row_data['Part Number'] == '':
 
-						if row_data['Model'] == '':
-							row_data['Model'] = row_data['Part Number']
-							row_data['Part Number'] = ''
+							if row_data['Model'] == '':
+								row_data['Model'] = row_data['Part Number']
+								row_data['Part Number'] = ''
 
-						elif row_data['Model'] == row_data['Part Number']:
-							row_data['Part Number'] = ''
-
-					if valid_row:
-						self.data.append(row_data)
+							elif row_data['Model'] == row_data['Part Number']:
+								row_data['Part Number'] = ''
+								
+					self.data.append(row_data)
 
 			# Look for columns
 			else:
