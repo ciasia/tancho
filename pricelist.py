@@ -10,11 +10,12 @@ class PriceList:
 
 	# Static list of field identifiers/aliases
 	wordList = {
-		# Can have just a model and no part #, but a part # without a model is just the model
+
 		'Model': ['Product ID', 'Model', 'Part Number'],
 		'Part Number': ['Part Number'],
 		'Short Description': ['Description'],
 		'URL': ['URL'],
+
 		# RRP and Cost are determined by highest and lowest dollar values in sheet
 		'MSRP':['RRP', 'MSRP'],
 		'Unit Cost':['Unit Cost','Trade','Buy','W/Sale']
@@ -51,7 +52,8 @@ class PriceList:
 
 	def parse(self):
 
-		# Create a list of columns for each desired field
+		# Create a list(map) of columns for each desired field
+		# Initially each desired field has a column value of -1 (null)
 		field_cols = {}
 		for key in PriceList.wordList:
 			field_cols[key] = -1
@@ -79,11 +81,11 @@ class PriceList:
 						match = False
 						if len(cell_value) > 1: # Only check non-blank cells
 
+							# Find field column by dollar value
 							if cell_value[0] == '$':
 								castable_cell_value = re.sub('[$,]','',cell_value)
 								money = float(castable_cell_value)
-
-								# Find field column by dollar value
+								
 								if field == 'rrp':
 									if money > highest:
 											highest = money
@@ -92,10 +94,10 @@ class PriceList:
 								if field == 'cost':
 										if money < lowest:
 											lowest = money
-											match = True				
+											match = True	
+											
+							# Find field column by field name			
 							else:
-
-								# Find field column by field name
 								for alias in aliases:
 									reg='.*?('+alias+')'
 									m = re.search(reg, cell_value,re.IGNORECASE) #Partial string matching
@@ -108,8 +110,8 @@ class PriceList:
 						if match:
 								field_cols[field] = c
 
+					# Check if all required columns have a match
 					if not all_fields_found:
-						# Check if all required columns have a match
 						all_fields_found = True
 						for x in field_cols:
 							if field_cols[x] == -1 and not (x in PriceList.optional_fields):
@@ -122,6 +124,7 @@ class PriceList:
 
 			if all_fields_found and not header_row == r: 
 
+
 				# Write to internal data
 				valid_row = True
 
@@ -130,39 +133,54 @@ class PriceList:
 				row_data['Vendor'] = self.vendor
 
 				for field in field_cols:
-					col = field_cols[field]
+					field_col = field_cols[field]
 
 					# Detect bad rows
-					if row[col] == '' and not (field in PriceList.optional_fields):
+					if row[field_col] == '' and not (field in PriceList.optional_fields):
 						valid_row = False
 						break
 
 					# If cell not blank, store value
-					if col > -1:
-						row_data[field] = row[col]
+					if field_col > -1:
+						row_data[field] = row[field_col]
 					else:
 						row_data[field] = ''
 
-				if valid_row:
-					self.data.append(row_data)
+
+				# Can have just a Model and no Part Number, but a Part Number without a model is just the model
+				if 'Model' in row_data and 'Part Number' in row_data:
+					if not row_data['Part Number'] == '':
+
+						if row_data['Model'] == '':
+							row_data['Model'] = row_data['Part Number']
+							row_data['Part Number'] = ''
+
+						elif row_data['Model'] == row_data['Part Number']:
+							row_data['Part Number'] = ''
+
+					if valid_row:
+						self.data.append(row_data)
 
 			# Next row
 			r += 1
 
+		# Return false if no data found
+		return ((len(self.data) > 0))
+
 	def write(self):
 
-		### Output directory - to be set by config file in future ###
+		### Output directory - to be set by config file in future version ###
 		if not os.path.basename(os.getcwd()) == 'out':
 			if not os.path.exists('out'):
 				os.makedirs('out')
 			os.chdir('out')
 
 		# Generate file name based on manufacturer/vendor
-		newFile = os.getcwd() + '\\' + self.manufacturer + '-' +  self.vendor + ".csv"
+		newFile = os.getcwd() + '\\' + self.vendor + '-' +  self.manufacturer + ".csv"
 
 		# Create new csv file
 		with open(newFile, 'w') as f:
-			field_names = ['Manufacturer', 'Vendor'] 
+			field_names = ['Vendor', 'Manufacturer'] 
 			field_names.extend(PriceList.wordList.keys())
 			w = csv.DictWriter(f, fieldnames=field_names, lineterminator='\n')
 			w.writeheader()
