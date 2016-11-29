@@ -81,11 +81,11 @@ class PriceList:
 						match = False
 						if len(cell_value) > 1: # Only check non-blank cells
 
+							# Find field column by dollar value
 							if cell_value[0] == '$':
 								castable_cell_value = re.sub('[$,]','',cell_value)
 								money = float(castable_cell_value)
-
-								# Find field column by dollar value
+								
 								if field == 'rrp':
 									if money > highest:
 											highest = money
@@ -94,10 +94,10 @@ class PriceList:
 								if field == 'cost':
 										if money < lowest:
 											lowest = money
-											match = True				
+											match = True	
+											
+							# Find field column by field name			
 							else:
-
-								# Find field column by field name
 								for alias in aliases:
 									reg='.*?('+alias+')'
 									m = re.search(reg, cell_value,re.IGNORECASE) #Partial string matching
@@ -110,8 +110,8 @@ class PriceList:
 						if match:
 								field_cols[field] = c
 
+					# Check if all required columns have a match
 					if not all_fields_found:
-						# Check if all required columns have a match
 						all_fields_found = True
 						for x in field_cols:
 							if field_cols[x] == -1 and not (x in PriceList.optional_fields):
@@ -123,7 +123,6 @@ class PriceList:
 					c = (c+1)%len(row)
 
 			if all_fields_found and not header_row == r: 
-
 
 
 				# Write to internal data
@@ -149,7 +148,6 @@ class PriceList:
 
 
 				# Can have just a Model and no Part Number, but a Part Number without a model is just the model
-
 				if 'Model' in row_data and 'Part Number' in row_data:
 					if not row_data['Part Number'] == '':
 
