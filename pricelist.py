@@ -8,9 +8,10 @@ import helpers
 
 class PriceList:
 
+
 	# Static list of field identifiers/aliases
 	wordList = {
-		'Model': ['Product ID', 'Model', 'Part Number'],
+		'Model': ['Product ID', 'Model', 'Part Number', 'Part'],
 		'Part Number': ['Part Number'],
 		'Short Description': ['Description'],
 		'URL': ['URL'],
@@ -28,7 +29,8 @@ class PriceList:
 	optional_fields = [
 		'Part Number',
 		'Short Description',
-		'URL'
+		'URL',
+		'MSRP'
 	]
 
 
@@ -88,9 +90,7 @@ class PriceList:
 
 						for field, aliases in PriceList.wordList.items():
 							
-							# Check cell values against word list
 							match = False
-							
 							currency_regex = re.compile("^\s*\$*\s*[0-9]+,*\s*[0-9]*\.+[0-9]+\s*$")
 
 							# Find field column by field name
@@ -146,8 +146,7 @@ class PriceList:
 				row_data['Manufacturer'] = self.manufacturer
 				row_data['Vendor'] = self.vendor
 
-				for field in field_cols:
-					field_col = field_cols[field]
+				for field, field_col in field_cols.items():
 
 					# Detect bad rows
 					if row[field_col] == '' and not (field in PriceList.optional_fields):
@@ -164,7 +163,7 @@ class PriceList:
 				if valid_row:
 
 					# "Can have just a Model and no Part Number, but a Part Number without a model is just the model"
-					if 'Model' in row_data and 'Part Number' in row_data:
+					if 'Part Number' in row_data:
 						if not row_data['Part Number'] == '':
 
 							if row_data['Model'] == '':
@@ -173,12 +172,22 @@ class PriceList:
 
 							elif row_data['Model'] == row_data['Part Number']:
 								row_data['Part Number'] = ''
+					
+					if 'MSRP' in row_data and 'Unit Cost' in row_data:
+						if row_data['MSRP'] == row_data['Unit Cost']:
+							row_data['MSRP'] = ''
 
 					self.data.append(row_data)
 
 
 			# Next row
 			r += 1
+
+		#print(field_cols)
+
+		for field, col in field_cols.items():
+			if not field in self.optional_fields and field_cols[field] == -1:
+				print("Missing data: "+field)
 
 		# Return false if no data found
 		return ((len(self.data) > 0))
