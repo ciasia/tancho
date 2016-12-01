@@ -6,7 +6,6 @@ from subprocess import call
 import helpers
 from pricelist import PriceList
 
-#inputFile = sys.argv[1]
 
 for inputFile in sys.argv:
 
